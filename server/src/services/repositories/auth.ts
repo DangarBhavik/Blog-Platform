@@ -84,7 +84,7 @@ export const refreshTokenUser = async (refreshToken: string) => {
     await prisma.user.update({
     where:{id:user.id},
     data:{
-        refreshToken
+        refreshToken: newRefreshToken
     }
     })
 

@@ -46,12 +46,19 @@ export const login = async(req: express.Request, res: express.Response) => {
 
         const user = await loginUser({ email, password });
 
-        res.cookie("refreshToken", user.refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        });
+                res.cookie("accessToken", user.accessToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+                    maxAge: 15 * 60 * 1000, // 15 minutes
+                });
+
+                res.cookie("refreshToken", user.refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+                });
 
         const response = new apiResponse(200, "User logged in successfully", user);
         return res.status(response.statusCode).json(response);
@@ -74,12 +81,19 @@ export const refreshToken = async (req: express.Request, res: express.Response) 
 
         const result = await refreshTokenUser(refreshToken);
 
-        res.cookie("refreshToken", result.refreshToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "strict",
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        });
+                res.cookie("accessToken", result.accessToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+                    maxAge: 15 * 60 * 1000, // 15 minutes
+                });
+
+                res.cookie("refreshToken", result.refreshToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+                    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+                });
 
         const response = new apiResponse(200, "Token refreshed successfully", result);
         return res.status(response.statusCode).json(response);
@@ -100,10 +114,15 @@ export const logout = async(req: express.Request, res: express.Response) => {
         }
         
         const logout = await logoutUser({refreshToken })
+        res.clearCookie("accessToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+        });
         res.clearCookie("refreshToken", {
             httpOnly: true,
-            secure: true,
-            sameSite: "strict",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
         });
         const response = new apiResponse(200, "User logged out successfully", null);
         return res.status(response.statusCode).json(response);
