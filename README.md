@@ -110,13 +110,6 @@ npm run dev
 - Frontend: `http://localhost:3000`
 - Backend API: `http://localhost:5000`
 
-## Default Seed User
-
-The seed script creates a default user for local development.
-
-- Email: `sarah@example.com`
-- Password: `password123`
-
 ## API Routes
 
 ### Auth
